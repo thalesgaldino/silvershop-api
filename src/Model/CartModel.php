@@ -232,6 +232,57 @@ class CartModel extends ShopModelBase
         return $this->getActionResponse();
     }
 
+    public function addItems($buyableArray)
+    {
+        $this->called_method = 'addItems';
+
+        if ($this->cart) {
+            try {
+                for ($i = 0; $i < sizeof($buyableArray); $i++) {
+                    $id = $buyableArray[$i]['id'];
+                    $quantity = $buyableArray[$i]['quantity'];
+                    $product = DataObject::get_by_id(Product::class, $id);
+                    //FIXME: result should be combined with all the products
+                    $result = $this->cart->add($product, $quantity);
+                }
+            } catch (Exception $e) {
+                $this->status       = 'error';
+                $this->code         = 400;
+                $this->message      = $e->getMessage();
+                $this->cart_updated = false;
+
+                return $this->getActionResponse();
+            }
+
+            if ($result === true || $result instanceof OrderItem) {
+                $this->status  = 'success';
+                $this->message = 'many items!!!';
+                //FIXME: get translation sorted
+                // $this->message = _t(
+                //     'SHOP_API_MESSAGES.ItemAdded',
+                //     'Item{plural} added successfully.',
+                //     ['plural' => $quantity0 == 1 ? '' : 's']
+                // );
+                // Set the cart updated flag, and which components to refresh
+                $this->cart_updated = true;
+                $this->refresh      = [
+                    'cart',
+                    'summary',
+                    'shippingmethod'
+                ];
+                // Set new total items
+                $this->total_items = $result instanceof OrderItem ? $result->Order()->Items()->Quantity() : $quantity0;
+
+            } else {
+                $this->code         = 400;
+                $this->status       = 'error';
+                $this->message      = $this->cart->getMessage();
+                $this->cart_updated = false;
+            }
+        }
+        return $this->getActionResponse();
+    }
+
     /**
      * Add a product that has variations
      *
