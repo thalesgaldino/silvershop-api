@@ -31,6 +31,7 @@ class ShopAPIController extends Controller
         'cart',
         'item',
         'product',
+        'add',
         'clear',
         'component',
         'promocode',
@@ -183,6 +184,19 @@ class ShopAPIController extends Controller
                 default:
                     return $this->processResponse($product->get());
             }
+        }
+
+        return $this->processResponse();
+    }
+
+    public function add(HTTPRequest $request)
+    {
+        $bodyArray = json_decode($request->getBody(), true);
+        
+        if ($bodyArray && sizeof($bodyArray) != 0) {
+            $cart = $this->cart;
+            $data = $cart->addItems($bodyArray);
+            return $this->processResponse($data);
         }
 
         return $this->processResponse();
