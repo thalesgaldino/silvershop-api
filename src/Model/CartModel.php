@@ -7,7 +7,10 @@ use Omnipay\Common\Currency;
 use SilverShop\Cart\ShoppingCart;
 use SilverShop\Model\OrderItem;
 use SilverShop\ORM\FieldType\ShopCurrency;
+use SilverShop\Model\Order;
 use SilverShop\Page\Product;
+use SilverShop\Checkout\Checkout;
+use SilverShop\Checkout\OrderProcessor;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DataObject;
@@ -17,6 +20,8 @@ use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\Debug;
 use SilverShop\Model\Variation\Variation;
+use SilverStripe\Omnipay\GatewayFieldsFactory;
+use SilverStripe\Omnipay\GatewayInfo;
 
 /**
  * Class CartModel
@@ -280,6 +285,84 @@ class CartModel extends ShopModelBase
                 $this->cart_updated = false;
             }
         }
+        return $this->getActionResponse();
+    }
+
+    public function sendOrder($bodyArray){
+        $this->called_method = 'sendOrder';
+
+        $order = null;
+        if ($this->cart){
+            $order = $this->cart->current();
+        }
+        
+        if ($order) {
+            $gateway = Checkout::get($order)->getSelectedPaymentMethod(false);
+            if (GatewayInfo::isOffsite($gateway)
+                || GatewayInfo::isManual($gateway)
+                || $this->config->hasComponentWithPaymentData()
+            ) {
+                return $this->submitpayment($bodyArray);
+            }else{
+                $this->code         =  500;
+                $this->status       = 'error';
+                $this->message      = 'Payment not available at the moment. Please try again later';
+                $this->cart_updated = false;
+            }
+        } else {
+            $this->code         = 404;
+            $this->status       = 'error';
+            $this->message      = _t('SHOP_API_MESSAGES.ProductNotFound', 'Product does not exist');
+            $this->cart_updated = false;
+        }
+        return $this->getActionResponse();
+    }
+
+    public function submitpayment($bodyArray){
+        
+        $order = $this->cart->current();
+        if ($bodyArray) {
+            //$bodyArray in the order for guest ordering
+            $order->setField('FirstName', $bodyArray['firstname']);
+            $order->setField('Surname', $bodyArray['surname']);
+            $order->setField('Email', $bodyArray['email']);
+            $order->setField('Notes', $bodyArray['notes']);
+        }
+
+        // final recalculation, before making payment
+        $order->calculate();
+
+        $gateway = Checkout::get($order)->getSelectedPaymentMethod(false);
+
+        $orderProcessor = OrderProcessor::create($order);
+
+        // try to place order before payment, if configured
+        if (Order::config()->place_before_payment) {
+            if (!$orderProcessor->placeOrder()) {
+                $this->code         =  500;
+                $this->status       = 'error';
+                $this->message      = $orderProcessor->getError();
+                $this->cart_updated = false;
+            }else{
+                $this->status  = 'success';
+                $this->message = 'order sent!!!';
+                // Set the cart updated flag, and which components to refresh
+                $this->cart_updated = true;
+                $this->refresh      = [
+                    'cart',
+                    'summary',
+                    'shippingmethod'
+                ];
+                // Set new total items
+                $this->total_items = 0;
+            }
+        }else{
+            $this->code         =  500;
+            $this->status       = 'error';
+            $this->message      = 'Payment not available at the moment. Please try again later';
+            $this->cart_updated = false;
+        }
+
         return $this->getActionResponse();
     }
 
