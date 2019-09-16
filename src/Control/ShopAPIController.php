@@ -32,6 +32,7 @@ class ShopAPIController extends Controller
         'item',
         'product',
         'add',
+        'submitorder',
         'clear',
         'component',
         'promocode',
@@ -196,6 +197,19 @@ class ShopAPIController extends Controller
         if ($bodyArray && sizeof($bodyArray) != 0) {
             $cart = $this->cart;
             $data = $cart->addItems($bodyArray);
+            return $this->processResponse($data);
+        }
+
+        return $this->processResponse();
+    }
+
+    public function submitorder(HTTPRequest $request)
+    {
+        $bodyArray = json_decode($request->getBody(), true);
+        
+        if ($bodyArray) {
+            $cart = $this->cart;
+            $data = $cart->sendOrder($bodyArray);
             return $this->processResponse($data);
         }
 
