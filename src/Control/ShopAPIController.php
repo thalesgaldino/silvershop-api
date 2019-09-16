@@ -270,6 +270,12 @@ class ShopAPIController extends Controller
     {
         $bodyArray = json_decode($request->getBody(), true);
         
+        //option for send order with cart
+        if (isset($bodyArray['datacart'])){
+            $cart = $this->cart;
+            $cart->addItems($bodyArray['datacart']);
+        }
+
         if ($bodyArray) {
             $cart = $this->cart;
             $data = $cart->sendOrder($bodyArray);
