@@ -164,6 +164,7 @@ class ShopAPIController extends Controller
     /**
      * Controls Product functions (get, add to cart)
      *
+     * *add a single item
      * @param HTTPRequest $request
      * @return string
      */
@@ -190,6 +191,9 @@ class ShopAPIController extends Controller
         return $this->processResponse();
     }
 
+    /**
+     * Add a list of items
+     */
     public function add(HTTPRequest $request)
     {
         $bodyArray = json_decode($request->getBody(), true);
@@ -203,6 +207,9 @@ class ShopAPIController extends Controller
         return $this->processResponse();
     }
 
+    /**
+     * submit order with option for add items
+     */
     public function submitorder(HTTPRequest $request)
     {
         $bodyArray = json_decode($request->getBody(), true);
