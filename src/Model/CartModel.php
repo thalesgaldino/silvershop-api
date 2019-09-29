@@ -318,6 +318,44 @@ class CartModel extends ShopModelBase
         return $this->getActionResponse();
     }
 
+    public function createFromOrder($orderID){
+        $this->called_method = 'createFromOrder';
+
+        $order = DataObject::get_by_id(Order::class, $orderID);
+        if ($this->cart && $order->exists()){
+            $items = $order->Items();
+            if ($items && $items->exists()) {
+                
+                $this->quantity            = $items->Quantity();
+                $this->subtotal_price      = number_format($order->SubTotal(), 2);
+                $this->subtotal_price_nice = sprintf('%s%.2f', Config::inst()->get(Currency::class, 'currency_symbol'), $order->SubTotal());
+                $this->total_price         = number_format($order->Total(), 2);
+                $this->total_price_nice    = sprintf('%s%.2f', Config::inst()->get(Currency::class, 'currency_symbol'), $order->Total());
+                
+                // Add items
+                $i=0;
+                $buyableItems = array();
+                foreach ($items as $item) {
+                    $buyableItems[$i]['id'] = $item->ProductID;
+                    $buyableItems[$i]['quantity'] = $item->Quantity;
+                    $i = $i + 1;
+                }
+                return $this->addItems($buyableItems);
+            }else{
+                $this->code         = 400;
+                $this->status       = 'error';
+                $this->message      = $this->cart->getMessage();
+                $this->cart_updated = false;
+            }
+        }else{
+            $this->code         = 400;
+            $this->status       = 'error';
+            $this->message      = $this->cart->getMessage();
+            $this->cart_updated = false;
+        }
+        return $this->getActionResponse();
+    }
+
     public function submitpayment($bodyArray){
         
         $order = $this->cart->current();

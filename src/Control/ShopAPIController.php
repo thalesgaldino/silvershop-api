@@ -38,6 +38,7 @@ class ShopAPIController extends Controller
         'product',
         'add',
         'submitorder',
+        'createfromorder',
         'clear',
         'component',
         'promocode',
@@ -224,7 +225,6 @@ class ShopAPIController extends Controller
     /**
      * Controls Product functions (get, add to cart)
      *
-     * *add a single item
      * @param HTTPRequest $request
      * @return string
      */
@@ -254,9 +254,6 @@ class ShopAPIController extends Controller
         return $this->processResponse();
     }
 
-    /**
-     * Add a list of items
-     */
     public function add(HTTPRequest $request)
     {
         $bodyArray = json_decode($request->getBody(), true);
@@ -270,9 +267,6 @@ class ShopAPIController extends Controller
         return $this->processResponse();
     }
 
-    /**
-     * submit order with option for add items
-     */
     public function submitorder(HTTPRequest $request)
     {
         $bodyArray = json_decode($request->getBody(), true);
@@ -286,6 +280,17 @@ class ShopAPIController extends Controller
         if ($bodyArray) {
             $cart = $this->cart;
             $data = $cart->sendOrder($bodyArray);
+            return $this->processResponse($data);
+        }
+
+        return $this->processResponse();
+    }
+
+    public function createfromorder(HTTPRequest $request){
+        $orderID = $request->getVar('orderid');
+        if ($orderID && is_numeric($orderID)) {
+            $cart = $this->cart;
+            $data = $cart->createFromOrder($orderID);
             return $this->processResponse($data);
         }
 
