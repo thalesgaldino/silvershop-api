@@ -18,6 +18,10 @@ use Toast\ShopAPI\Model\ProductModel;
 use Toast\ShopAPI\Model\VariationModel;
 use SilverStripe\Dev\Debug;
 
+use SilverStripe\RestfulServer\BasicRestfulAuthenticator;
+use SilverStripe\Security\Member;
+use SilverStripe\Security\Security;
+
 /**
  * Class ShopAPIController
  */
@@ -47,8 +51,28 @@ class ShopAPIController extends Controller
         'variation',
         'wishlist',
         'comparelist',
-        'enquirylist'
+        'enquirylist',
+        'login'
     ];
+
+    /**
+     * @config
+     * @var string Class name for an authenticator to use on API access
+     */
+    private static $authenticator = BasicRestfulAuthenticator::class;
+
+    /**
+     * @uses authenticate()
+     * @var Member
+     */
+    protected $member;
+
+//    public function __construct()
+//    {
+//        parent::__construct();
+//
+//        $this->cart = CartModel::create();
+//    }
 
     public function init()
     {
@@ -265,6 +289,28 @@ class ShopAPIController extends Controller
         }
 
         return $this->processResponse();
+    }
+
+    public function login(HTTPRequest $request){
+        // authenticate through HTTP BasicAuth
+        $this->member = $this->authenticate();
+
+        $cart = $this->cart;
+        $data = $cart->setCurrentUser($this->member);
+        return $this->processResponse($data);
+    }
+
+    /**
+     * A function to authenticate a user
+     *
+     * @return Member|false the logged in member
+     */
+    protected function authenticate()
+    {
+        $authClass = $this->config()->authenticator;
+        $member = $authClass::authenticate();
+        Security::setCurrentUser($member);
+        return $member;
     }
 
     public function submitorder(HTTPRequest $request)

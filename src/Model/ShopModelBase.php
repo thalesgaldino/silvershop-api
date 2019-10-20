@@ -222,11 +222,20 @@ abstract class ShopModelBase
         $this->extend('updateRefreshComponents', $refreshComponents);
 
         $data = [
-            'cart_updated' => $this->cart_updated,
-            'refresh'      => $refreshComponents,
-            'quantity'     => $this->total_items,
-            'shipping_id'  => $this->shipping_id,
-            'model'        => $this
+            'request' => $request->httpMethod(),
+            'status'  => $this->status, // success, error
+            'method'  => $this->called_method,
+            'elapsed' => $this->elapsed,
+            'message' => $this->message,
+            'code'    => $this->code,
+            'data'    => [
+                'cart_updated' => $this->cart_updated,
+                'refresh'      => $refreshComponents,
+                'quantity'     => $this->total_items,
+                'shipping_id'  => $this->shipping_id,
+                'user_id'  => $this->user_id,
+                'model'        => $this
+            ]
         ];
 
         $this->extend('onBeforeActionResponse', $data);
