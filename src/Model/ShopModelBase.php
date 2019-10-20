@@ -208,6 +208,7 @@ abstract class ShopModelBase
                 'refresh'      => $refreshComponents,
                 'quantity'     => $this->total_items,
                 'shipping_id'  => $this->shipping_id,
+                'user_id'  => $this->user_id,
             ]
         ];
 

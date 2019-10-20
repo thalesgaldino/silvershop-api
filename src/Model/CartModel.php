@@ -562,4 +562,22 @@ class CartModel extends ShopModelBase
         ];
         return $this->getActionResponse();
     }
+
+    public function setCurrentUser($member)
+    {
+        if($member && $member->ID){
+            $this->called_method = 'setCurrentUser';
+            $this->status  = 'success';
+            $this->code = 200;
+            $this->message = _t('SHOP_API_MESSAGES.SetCurrentUser', 'Set current user');
+            $this->user_id = $member->ID;
+        }else{
+            $this->status  = 'error';
+            $this->message = _t('SHOP_API_MESSAGES.LoginFail', 'Invalid credentials');
+            $this->code = 403;
+            $this->user_id = null;
+        }
+        
+        return $this->getActionResponse();
+    }
 }
