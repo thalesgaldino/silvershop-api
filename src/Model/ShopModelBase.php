@@ -180,25 +180,25 @@ abstract class ShopModelBase
 
 
             //wishlistLink
-            $wishListBase = Controller::join_links(Director::absoluteBaseURL(), CheckoutPageController::config()->url_segment);
-            if ($page = WishListPage::get()->first()) {
-                $wishListBase = $page->AbsoluteLink();
-            }
-            $this->wish_list_link = $wishListBase;
+            // $wishListBase = Controller::join_links(Director::absoluteBaseURL(), CheckoutPageController::config()->url_segment);
+            // if ($page = WishListPage::get()->first()) {
+            //     $wishListBase = $page->AbsoluteLink();
+            // }
+            // $this->wish_list_link = $wishListBase;
 
-            //CompareLink
-            $compareBase = Controller::join_links(Director::absoluteBaseURL(), CheckoutPageController::config()->url_segment);
-            if ($page = ComparePage::get()->first()) {
-                $compareBase = $page->AbsoluteLink();
-            }
-            $this->compare_list_link = $compareBase;
+            // //CompareLink
+            // $compareBase = Controller::join_links(Director::absoluteBaseURL(), CheckoutPageController::config()->url_segment);
+            // if ($page = ComparePage::get()->first()) {
+            //     $compareBase = $page->AbsoluteLink();
+            // }
+            // $this->compare_list_link = $compareBase;
 
 
-            $compareBase = Controller::join_links(Director::absoluteBaseURL(), CheckoutPageController::config()->url_segment);
-            if ($page = EnquiryPage::get()->first()) {
-                $enquiryBase = $page->AbsoluteLink();
-            }
-            $this->enquiry_list_link = $enquiryBase;
+            // $compareBase = Controller::join_links(Director::absoluteBaseURL(), CheckoutPageController::config()->url_segment);
+            // if ($page = EnquiryPage::get()->first()) {
+            //     $enquiryBase = $page->AbsoluteLink();
+            // }
+            // $this->enquiry_list_link = $enquiryBase;
 
         } else {
             user_error('Missing Silvershop module', E_USER_WARNING);
@@ -222,7 +222,7 @@ abstract class ShopModelBase
         $this->extend('updateRefreshComponents', $refreshComponents);
 
         $data = [
-            'request' => $request->httpMethod(),
+            // 'request' => $request->httpMethod(),
             'status'  => $this->status, // success, error
             'method'  => $this->called_method,
             'elapsed' => $this->elapsed,

@@ -90,7 +90,7 @@ class CartItemModel extends ShopModelBase
                 // Set the initial properties
                 $this->item_id     = $this->item->ID;
                 $this->internal_item_id = $this->item->Product()->InternalItemID;
-                $this->title       = $this->item->TableTitle();
+                $this->title       = $this->item->getTableTitle();
                 $this->total_items = $this->item->Quantity;
 
                 // Set prices
@@ -156,7 +156,7 @@ class CartItemModel extends ShopModelBase
                         }
                     }
                     if ($this->buyable->ClassName == Product::class){
-                        if ($this->buyable->RelatedProducts()){
+                        if ($this->buyable->RelatedProducts && $this->buyable->RelatedProducts()){
                             foreach ($this->buyable->RelatedProducts()->limit(5) as $relatedProduct){
                                 $endpoint = Controller::join_links(Director::absoluteBaseURL(), 'shop-api/cart/product', $relatedProduct->ID);
     //                            $unitValue  = $additionalOption->UnitPrice();

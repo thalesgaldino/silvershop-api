@@ -41,7 +41,7 @@ class ModifierModel extends ShopModelBase
             if ($this->modifier->exists()) {
                 // Set the initial properties
                 $this->modifier_id = $this->modifier->ID;
-                $this->title       = $this->modifier->TableTitle();
+                $this->title       = $this->modifier->getTableTitle();
 
                 // Set prices
                 $unitValue   = $this->modifier->TableValue();
