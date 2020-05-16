@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "silverstripe/recipe-cms": "^1.0.3",
+        "silverstripe/recipe-cms": "^4",
         "silvershop/core": "*"
     },
     "require-dev": {
