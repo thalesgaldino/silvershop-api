@@ -217,6 +217,8 @@ class ShopAPIController extends Controller
         switch ($request->param('OtherAction')) {
             case 'update':
                 return $this->processResponse($cart->updateShipping($request->getVar('ID')));
+            case 'set':
+                return $this->processResponse($cart->updateShippingMethod($request->getVar('option'), $request->getVar('datetime')));
             case 'get':
                 return $this->processResponse($cart->getShipping());
             default:

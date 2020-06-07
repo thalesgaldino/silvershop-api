@@ -601,6 +601,27 @@ class CartModel extends ShopModelBase
         return $this->getActionResponse();
     }
 
+    /**
+     * Custom update shipping method. 
+     * Note: depends if you have an extension that sets shipping methods
+     */
+    public function updateShippingMethod($option, $datetime){
+
+        $this->called_method = 'updateShippingMethod';
+
+        if ($this->order) {
+            $this->order->setupShippingMethod($option, $datetime);
+            
+            $this->status  = 'success';
+            $this->message = _t('SHOP_API_MESSAGES.ShippingUpdated', 'Cart shipping updated');
+        }else {
+            $this->status  = 'failure';
+            $this->message = _t('SHOP_API_MESSAGES.ShippingNotUpdated', 'Cart shipping NOT updated');
+        }
+
+        return $this->getActionResponse();
+    }
+
     public function getShipping()
     {
         $this->called_method = 'getShipping';
